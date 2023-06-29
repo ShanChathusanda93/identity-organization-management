@@ -90,6 +90,7 @@ import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.AUTH
 import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.AUTH_TYPE_FLOW;
 import static org.wso2.carbon.identity.base.IdentityConstants.OpenId.OPENID;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
+import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.AUTH_TYPE_OAUTH_2;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.DELETE_FRAGMENT_APPLICATION;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.DELETE_SHARE_FOR_MAIN_APPLICATION;
@@ -97,7 +98,6 @@ import static org.wso2.carbon.identity.organization.management.application.const
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.OIDC_CLAIM_DIALECT_URI;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.OIDC_LOGOUT_URL;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.ORGANIZATION_LOGIN_AUTHENTICATOR;
-import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.ORG_QUALIFIED_OIDC_LOGOUT_URL;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.SHARE_WITH_ALL_CHILDREN;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.TENANT;
 import static org.wso2.carbon.identity.organization.management.application.constant.OrgApplicationMgtConstants.UPDATE_SP_METADATA_SHARE_WITH_ALL_CHILDREN;
@@ -547,13 +547,13 @@ public class OrgApplicationManagerImpl implements OrgApplicationManager {
         FederatedAuthenticatorConfig[] fedAuthConfigs = new FederatedAuthenticatorConfig[1];
         Property[] properties = new Property[1];
         properties[0].setName(OIDC_LOGOUT_URL);
-        try {
-            properties[0].setValue(ServiceURLBuilder.create().addPath(ORG_QUALIFIED_OIDC_LOGOUT_URL)
-                    .build().getAbsolutePublicURL());
-        } catch (URLBuilderException e) {
-            throw new IdentityProviderManagementException(
-                    "Error while building url for context: /oidc/logout");
-        }
+//        try {
+//            properties[0].setValue(ServiceURLBuilder.create().addPath(ORG_QUALIFIED_OIDC_LOGOUT_URL)
+//                    .build().getAbsolutePublicURL());
+//        } catch (URLBuilderException e) {
+//            throw new IdentityProviderManagementException(
+//                    "Error while building url for context: /oidc/logout");
+//        }
         fedAuthConfigs[0].setProperties(properties);
         fedAuthConfigs[0].setName(ORGANIZATION_LOGIN_AUTHENTICATOR);
         fedAuthConfigs[0].setEnabled(true);
@@ -702,7 +702,12 @@ public class OrgApplicationManagerImpl implements OrgApplicationManager {
         skipConsentProp.setName(SKIP_CONSENT);
         skipConsentProp.setValue(Boolean.TRUE.toString());
 
-        ServiceProviderProperty[] spProperties = new ServiceProviderProperty[]{fragmentAppProperty, skipConsentProp};
+        ServiceProviderProperty skipLogoutConsentProp = new ServiceProviderProperty();
+        skipLogoutConsentProp.setName(SKIP_LOGOUT_CONSENT);
+        skipLogoutConsentProp.setValue(Boolean.TRUE.toString());
+
+        ServiceProviderProperty[] spProperties = new ServiceProviderProperty[]
+                {fragmentAppProperty, skipConsentProp, skipLogoutConsentProp};
         serviceProvider.setSpProperties(spProperties);
     }
 
